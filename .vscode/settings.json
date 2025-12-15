@@ -1,0 +1,39 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.espIdfPathWin": "C:\\Users\\lucas\\esp\\v5.4.1\\esp-idf",
+  "idf.pythonInstallPath": "c:\\Espressif\\tools\\tools\\idf-python\\3.11.2\\python.exe",
+  "idf.openOcdConfigs": [
+    "board/esp32s3-builtin.cfg"
+  ],
+  "idf.toolsPathWin": "c:\\Espressif\\tools",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32s3"
+  },
+  "clangd.path": "c:\\Espressif\\tools\\tools\\esp-clang\\esp-18.1.2_20240912\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=c:\\Espressif\\tools\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+    "--compile-commands-dir=${workspaceFolder}\\build"
+  ],
+  "idf.flashType": "UART",
+  "idf.portWin": "COM4",
+  "files.associations": {
+    "freertos.h": "c",
+    "esp_netif_sntp.h": "c",
+    "esp_system.h": "c",
+    "nvs_flash.h": "c",
+    "esp_log.h": "c",
+    "cam_controller.h": "c",
+    "stdlib.h": "c",
+    "event_groups.h": "c",
+    "task.h": "c",
+    "photographer.h": "c",
+    "timers.h": "c",
+    "esp_sntp.h": "c",
+    "web_service.h": "c",
+    "param.h": "c",
+    "esp_wifi.h": "c",
+    "time.h": "c",
+    "base64.h": "c"
+  }
+}

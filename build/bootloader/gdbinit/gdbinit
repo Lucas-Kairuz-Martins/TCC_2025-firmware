@@ -1,0 +1,2 @@
+source D:/github/TCC_2025-firmware/build/bootloader/gdbinit/symbols
+source D:/github/TCC_2025-firmware/build/bootloader/gdbinit/connect

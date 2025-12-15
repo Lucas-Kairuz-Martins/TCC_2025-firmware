@@ -1,0 +1,96 @@
+import json
+import base64
+import boto3
+import os
+import datetime
+
+# Inicializa o cliente S3 fora do handler para performance (reuso de conexão)
+s3_client = boto3.client('s3')
+
+def lambda_handler(event, context):
+    
+    try:
+        # --- 1. Obter o Nome do Bucket ---
+        # Pegamos o nome do bucket das variáveis de ambiente da Lambda
+        # (Você configura isso na própria Lambda, veja instruções abaixo)
+        try:
+            bucket_name = os.environ['S3_BUCKET_NAME']
+        except KeyError:
+            print("Erro: Variável de ambiente teste-fotos-esp32 não definida.")
+            return {
+                'statusCode': 500,
+                'body': json.dumps({'message': 'Configuração interna do servidor incompleta.'})
+            }
+
+        # --- 2. Parsear o JSON ---
+        # O API Gateway envia os dados dentro de 'body' como uma string
+        print("Carregando corpo (body) do evento...")
+        body_str = event.get('body')
+        if not body_str:
+            return {'statusCode': 400, 'body': json.dumps({'message': 'Corpo da requisição vazio.'})}
+            
+        data = json.loads(body_str)
+        
+        # --- 3. Extrair os Dados ---
+        print("Extraindo dados do JSON...")
+        image_base64 = data['imagem_base64']
+        battery_level = data['bateria']
+        device_timestamp = data['timestamp']
+        
+        # --- 4. Decodificar a Imagem ---
+        # A imagem vem como texto Base64, precisamos converter de volta para binário
+        print("Decodificando imagem Base64...")
+        image_data = base64.b64decode(image_base64)
+        
+        # --- 5. Criar Nome de Arquivo Único ---
+        # Usamos a data/hora ATUAL do servidor para garantir um nome único
+        # e organizar em pastas por data.
+        now = datetime.datetime.now()
+        date_folder = now.strftime('%Y-%m-%d') # Pasta (ex: 2025-11-03)
+        time_filename = now.strftime('%Y%m%dT%H%M%S') # Arquivo (ex: 20251103T174530)
+        
+        # O nome final do arquivo no S3 (a "Key")
+        s3_key = f"uploads/{date_folder}/{time_filename}.jpg"
+        
+        # --- 6. Salvar no S3 ---
+        print(f"Enviando para o S3: Bucket={bucket_name}, Key={s3_key}")
+        
+        s3_client.put_object(
+            Bucket=bucket_name,
+            Key=s3_key,
+            Body=image_data,
+            ContentType='image/jpeg', # IMPORTANTE: Veja a nota abaixo!
+            Metadata={
+                # Adicionamos seus dados extras como Metadados do S3
+                'battery-level': str(battery_level),
+                'device-timestamp': device_timestamp
+            }
+        )
+        
+        print("Upload concluído com sucesso.")
+        
+        # --- 7. Retornar Sucesso ---
+        # Envia uma resposta 200 (OK) de volta para o API Gateway
+        return {
+            'statusCode': 200,
+            'headers': { 'Content-Type': 'application/json' },
+            'body': json.dumps({
+                'message': 'Upload realizado com sucesso!',
+                's3_key': s3_key
+            })
+        }
+
+    except json.JSONDecodeError as e:
+        print(f"Erro de JSON: {e}")
+        return {'statusCode': 400, 'body': json.dumps({'message': 'JSON mal formatado.'})}
+        
+    except Exception as e:
+        # Captura qualquer outro erro
+        print(f"Erro inesperado: {e}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'message': 'Erro interno no servidor.',
+                'error': str(e)
+            })
+        }
