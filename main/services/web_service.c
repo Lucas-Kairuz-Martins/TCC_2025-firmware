@@ -1,8 +1,8 @@
 #include "services/web_service.h"
 
 /*** Wi-Fi config ***/
-#define SEU_WIFI_SSID  "iPhone de lucas"
-#define SEU_WIFI_SENHA "TCC_2025"
+#define SEU_WIFI_SSID  "§§§§§§§§"
+#define SEU_WIFI_SENHA "********"
 
 static const char* TAG = "WEB_SERVICE";
 
